@@ -16,10 +16,10 @@ import (
 )
 
 func Plot() {
-	xticks := plot.TimeTicks{Format: "2006-01-02\n15:04"}
+	xticks := plot.TimeTicks{Format: "2006-01-02"}
 
-	// randomPoints returns some random x, y points
-	// with some interesting kind of trend.
+	var firstdate time.Time
+	var lastdate time.Time
 	randomPoints := func(n int) plotter.XYs {
 		const (
 			month = 1
@@ -39,6 +39,9 @@ func Plot() {
 		i := 0
 		for {
 			record, err := r.Read()
+			if i == 0 {
+				firstdate, err = time.Parse("20060102", record[0])
+			}
 			if err == io.EOF {
 				break
 			}
@@ -49,9 +52,14 @@ func Plot() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			date := time.Date(2020+i, month, day, hour, min, sec, nsec, time.UTC).Unix()
-			pts[i].X = float64(date)
+			date, err := time.Parse("20060102", record[0])
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			pts[i].X = float64(date.Unix())
 			pts[i].Y = weight
+			lastdate, err = time.Parse("20060102", record[0])
 			i++
 		}
 		return pts
@@ -65,8 +73,8 @@ func Plot() {
 	p.X.Tick.Marker = xticks
 	p.Y.Label.Text = "Kg"
 
-	p.X.Min = float64(time.Date(2019, 1, 1, 0, 0, 0, 0, time.UTC).Unix())
-	p.X.Max = float64(time.Date(2030, 1, 1, 0, 0, 0, 0, time.UTC).Unix())
+	p.X.Min = float64(lastdate.Unix())
+	p.X.Max = float64(firstdate.Unix())
 	p.Y.Min = 40
 	p.Y.Max = 80
 	p.Add(plotter.NewGrid())
@@ -81,7 +89,7 @@ func Plot() {
 
 	p.Add(line, points)
 
-	err = p.Save(30*vg.Centimeter, 5*vg.Centimeter, "timeseries.png")
+	err = p.Save(30*vg.Centimeter, 20*vg.Centimeter, "timeseries.png")
 	if err != nil {
 		log.Panic(err)
 	}
