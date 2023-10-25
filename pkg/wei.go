@@ -15,23 +15,15 @@ import (
 	"gonum.org/v1/plot/vg/draw"
 )
 
-func Plot() {
-	xticks := plot.TimeTicks{Format: "2006-01-02"}
+const input = "weight.csv"
 
+func Plot() {
 	var firstdate time.Time
 	var lastdate time.Time
 	randomPoints := func(n int) plotter.XYs {
-		const (
-			month = 1
-			day   = 1
-			hour  = 1
-			min   = 1
-			sec   = 1
-			nsec  = 1
-		)
 		pts := make(plotter.XYs, n)
 
-		f, err := os.Open("weight.csv")
+		f, err := os.Open(input)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -70,7 +62,7 @@ func Plot() {
 
 	p := plot.New()
 	p.Title.Text = "Time Series"
-	p.X.Tick.Marker = xticks
+	p.X.Tick.Marker = plot.TimeTicks{Format: "2006-01-02"}
 	p.Y.Label.Text = "Kg"
 
 	p.X.Min = float64(lastdate.Unix())
