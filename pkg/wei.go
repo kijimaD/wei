@@ -17,56 +17,82 @@ import (
 
 const input = "weight.csv"
 
-func Plot() {
-	var firstdate time.Time
-	var lastdate time.Time
-	randomPoints := func(n int) plotter.XYs {
-		pts := make(plotter.XYs, n)
+type Wei struct {
+	firstdate time.Time
+	lastdate  time.Time
+	count     int
+}
 
-		f, err := os.Open(input)
+func New() *Wei {
+	return &Wei{}
+}
+
+func (w *Wei) getPoints() plotter.XYs {
+	pts := make(plotter.XYs, w.count)
+	f, err := os.Open(input)
+	if err != nil {
+		log.Fatal(err)
+	}
+	r := csv.NewReader(f)
+	i := 0
+	for {
+		record, err := r.Read()
+		if err == io.EOF {
+			break
+		}
 		if err != nil {
 			log.Fatal(err)
 		}
-		r := csv.NewReader(f)
-		i := 0
-		for {
-			record, err := r.Read()
-			if i == 0 {
-				firstdate, err = time.Parse("20060102", record[0])
-			}
-			if err == io.EOF {
-				break
-			}
-			if err != nil {
-				log.Fatal(err)
-			}
-			weight, err := strconv.ParseFloat(record[1], 64)
-			if err != nil {
-				log.Fatal(err)
-			}
-			date, err := time.Parse("20060102", record[0])
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			pts[i].X = float64(date.Unix())
-			pts[i].Y = weight
-			lastdate, err = time.Parse("20060102", record[0])
-			i++
+		weight, err := strconv.ParseFloat(record[1], 64)
+		if err != nil {
+			log.Fatal(err)
 		}
-		return pts
+		date, err := time.Parse("20060102", record[0])
+		if err != nil {
+			log.Fatal(err)
+		}
+		pts[i].X = float64(date.Unix())
+		pts[i].Y = weight
+		i++
 	}
+	return pts
+}
 
-	n := 5
-	data := randomPoints(n)
+func (w *Wei) analyze() {
+	f, err := os.Open(input)
+	if err != nil {
+		log.Fatal(err)
+	}
+	r := csv.NewReader(f)
+	i := 0
+	for {
+		record, err := r.Read()
+		if i == 0 {
+			w.firstdate, err = time.Parse("20060102", record[0])
+		}
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatal(err)
+		}
+		w.lastdate, err = time.Parse("20060102", record[0])
+		i++
+	}
+	w.count = i
+}
+
+func (w *Wei) Plot() {
+	w.analyze()
+	data := w.getPoints()
 
 	p := plot.New()
 	p.Title.Text = "Time Series"
 	p.X.Tick.Marker = plot.TimeTicks{Format: "2006-01-02"}
 	p.Y.Label.Text = "Kg"
 
-	p.X.Min = float64(lastdate.Unix())
-	p.X.Max = float64(firstdate.Unix())
+	p.X.Min = float64(w.lastdate.Unix())
+	p.X.Max = float64(w.firstdate.Unix())
 	p.Y.Min = 40
 	p.Y.Max = 80
 	p.Add(plotter.NewGrid())
