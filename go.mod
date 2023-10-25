@@ -1,8 +1,12 @@
 module github.com/kijimaD/wei
 
-go 1.20
+go 1.21
 
-require github.com/stretchr/testify v1.8.2
+require (
+	github.com/stretchr/testify v1.8.2
+	golang.org/x/exp v0.0.0-20230801115018-d63ba01acd4b
+	gonum.org/v1/plot v0.14.0
+)
 
 require (
 	git.sr.ht/~sbinet/gg v0.5.0 // indirect
@@ -16,6 +20,5 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	golang.org/x/image v0.11.0 // indirect
 	golang.org/x/text v0.12.0 // indirect
-	gonum.org/v1/plot v0.14.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
