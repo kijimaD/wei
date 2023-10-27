@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"os"
 )
 
@@ -20,16 +21,21 @@ func NewEntry(weight float64) *Entry {
 }
 
 func (e *Entry) Record() error {
+	const output = "hello"
+
 	// ファイルがない場合は作る
 	if _, err := os.Stat("hello"); errors.Is(err, os.ErrNotExist) {
-		f, err := os.Create("hello")
+		f, err := os.Create(output)
 		defer f.Close()
 		if err != nil {
 			return err
 		}
 		fmt.Println("created!")
 	}
-	f, err := os.Open("hello")
+	f, err := os.OpenFile(output, os.O_APPEND|os.O_WRONLY, 0600) // 追加モード
+	if err != nil {
+		log.Fatal(err)
+	}
 	defer f.Close()
 	if err != nil {
 		return err
