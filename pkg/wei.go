@@ -93,7 +93,7 @@ func (w *Wei) getPoints() plotter.XYs {
 	return pts
 }
 
-// なめて値を入れる
+// データを見て設定値を決定する
 func (w *Wei) analyze() {
 	f, err := os.Open(input)
 	if err != nil {

@@ -1,8 +1,15 @@
 package main
 
-import wei "github.com/kijimaD/wei/pkg"
+import (
+	"os"
+
+	"github.com/kijimaD/wei/cmd"
+)
 
 func main() {
-	w := wei.New()
-	w.Plot()
+	cli := cmd.New()
+	err := cli.Execute(os.Args)
+	if err != nil {
+		panic(err)
+	}
 }
