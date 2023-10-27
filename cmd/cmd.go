@@ -3,7 +3,6 @@ package cmd
 import (
 	"errors"
 	"flag"
-	"fmt"
 
 	wei "github.com/kijimaD/wei/pkg"
 )
@@ -29,8 +28,11 @@ func (c *CLI) Execute(args []string) error {
 		w := wei.New()
 		w.Plot()
 	} else if args[1] == "rec" {
-		// TODO: 未実装
-		fmt.Println("rec")
+		e := wei.NewEntry(55.55)
+		err := e.Record()
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
