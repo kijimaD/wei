@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"errors"
-	"flag"
 
 	wei "github.com/kijimaD/wei/pkg"
 )
@@ -18,8 +17,6 @@ func New() *CLI {
 }
 
 func (c *CLI) Execute(args []string) error {
-	flag.Parse()
-
 	if len(args) <= 1 {
 		return NotExistSubCommand
 	}
@@ -28,8 +25,12 @@ func (c *CLI) Execute(args []string) error {
 		w := wei.New()
 		w.Plot()
 	} else if args[1] == "rec" {
-		e := wei.NewEntry(55.55)
-		err := e.Record()
+		cnf, err := wei.LoadConfigForYaml()
+		if err != nil {
+			return err
+		}
+		e := wei.NewEntry(cnf, 55.55)
+		err = e.Record()
 		if err != nil {
 			return err
 		}

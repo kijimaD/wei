@@ -13,11 +13,15 @@ import (
 // すでに存在する場合と、ない場合の処理を分ける?
 
 type Entry struct {
+	config *config
 	weight float64
 }
 
-func NewEntry(weight float64) *Entry {
-	return &Entry{weight: weight}
+func NewEntry(config *config, weight float64) *Entry {
+	return &Entry{
+		config: config,
+		weight: weight,
+	}
 }
 
 func (e *Entry) Record() error {
