@@ -3,6 +3,8 @@ package cmd
 import (
 	"errors"
 	"flag"
+	"os"
+	"path/filepath"
 	"strconv"
 
 	wei "github.com/kijimaD/wei/pkg"
@@ -12,6 +14,8 @@ var (
 	NotExistSubCommand = errors.New("wei need subcommand.\nbuild build image\nrec record weight")
 )
 
+const defaultConfigPath = ".wei/config.yml"
+
 type CLI struct{}
 
 func New() *CLI {
@@ -19,12 +23,13 @@ func New() *CLI {
 }
 
 func (c *CLI) Execute() error {
-	cnf, err := wei.LoadConfigForYaml()
-	if err != nil {
-		return err
-	}
+	homedir, _ := os.UserHomeDir()
+	expanded := filepath.Join(homedir, defaultConfigPath)
+	var configPath = flag.String("c", expanded, "config path")
+	flag.Parse()
+
 	args := flag.Args()
-	if len(args) <= 1 {
+	if len(args) == 0 {
 		return NotExistSubCommand
 	}
 	argSubcmd := args[0]
@@ -32,6 +37,10 @@ func (c *CLI) Execute() error {
 		w := wei.New()
 		w.Plot()
 	} else if argSubcmd == "rec" {
+		cnf, err := wei.LoadConfigForYaml(*configPath)
+		if err != nil {
+			return err
+		}
 		argWeight := args[1]
 		weight, err := strconv.ParseFloat(argWeight, 64)
 		if err != nil {
