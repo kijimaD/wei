@@ -9,9 +9,6 @@ import (
 	"time"
 )
 
-// 書き込み先と書き込む内容を指定する
-// すでに存在する場合と、ない場合の処理を分ける?
-
 type Entry struct {
 	config *config
 	weight float64
@@ -25,7 +22,7 @@ func NewEntry(config *config, weight float64) *Entry {
 }
 
 func (e *Entry) Record() error {
-	// ファイルがない場合は作る
+	// CSVファイルがない場合は作る
 	if _, err := os.Stat(e.config.CsvPath); errors.Is(err, os.ErrNotExist) {
 		f, err := os.Create(e.config.CsvPath)
 		defer f.Close()
