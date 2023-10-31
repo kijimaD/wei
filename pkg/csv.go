@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"os"
+	"time"
 )
 
 // 書き込み先と書き込む内容を指定する
@@ -25,20 +25,17 @@ func NewEntry(config *config, weight float64) *Entry {
 }
 
 func (e *Entry) Record() error {
-	const output = "hello"
-
 	// ファイルがない場合は作る
-	if _, err := os.Stat("hello"); errors.Is(err, os.ErrNotExist) {
-		f, err := os.Create(output)
+	if _, err := os.Stat(e.config.CsvPath); errors.Is(err, os.ErrNotExist) {
+		f, err := os.Create(e.config.CsvPath)
 		defer f.Close()
 		if err != nil {
 			return err
 		}
-		fmt.Println("created!")
 	}
-	f, err := os.OpenFile(output, os.O_APPEND|os.O_WRONLY, 0600) // 追加モード
+	f, err := os.OpenFile(e.config.CsvPath, os.O_APPEND|os.O_WRONLY, 0600) // 追加モード
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer f.Close()
 	if err != nil {
@@ -54,8 +51,8 @@ func (e *Entry) Record() error {
 // エントリを書き込む
 func (e *Entry) Write(w io.Writer) error {
 	csv := csv.NewWriter(w)
-	// TODO: 日付、重さに変更する
-	err := csv.Write([]string{"hello", "world"})
+	datestr := fmt.Sprint(time.Now().Format("20060102"))
+	err := csv.Write([]string{datestr, fmt.Sprintf("%.2f", e.weight)})
 	if err != nil {
 		return err
 	}
