@@ -19,5 +19,6 @@ func LoadConfigForYaml(configPath string) (*config, error) {
 
 	var cfg config
 	err = yaml.NewDecoder(f).Decode(&cfg)
+	cfg.CsvPath = ExpandHomedir(cfg.CsvPath)
 	return &cfg, err
 }
