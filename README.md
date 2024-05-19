@@ -1,7 +1,5 @@
 # wei
 
-Go template repository.
-
 ## install
 
 ```
